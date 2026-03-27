@@ -217,8 +217,8 @@ class FourierRealSeries:
             Output:
                 result: (FourierRealSeries)
 
-        NOTE: Be careful when multiplying. If we multiply two cosine series, 
-              sine 0 coefficients will be also generated..
+        Note: new_cos and new_sin are preallocated to their maximum possible size;
+        some trailing coefficients may remain ZERO if no frequency interaction reaches them.
         """
 
         #######################################
@@ -992,22 +992,13 @@ class Functions_1D:
 
     def inverse(self, name=None):
         """
-        Returns the inverse function 1/self and its derivatives up to the available order.
+        Returns 1/self as a Functions_1D object with derivatives up to the available order.
 
-        The value is:
-            (1/f)(x) = 1 / f(x)
-
-        Higher derivatives are computed using a Faà di Bruno–type formula specialized
-        to the inverse. The implementation precomputes "recipes" for each derivative order,
-        so evaluation at x only needs:
-            - f(x)
-            - derivatives f^{(j)}(x)
-
-        Variables:
-            Input:
-                name: (str | None) optional name.
-            Output:
-                result: (Functions_1D) inverse function with derivatives.
+        Derivatives are computed via the Faà di Bruno formula specialized to the inverse:
+            (1/f)^{(n)} = sum_{partitions of n} n! / (prod n_j! * (j!)^{n_j})
+                          * (-1)^{|ns|} * |ns|! / f^{|ns|+1} * prod f^{(j)}^{n_j}
+        where the sum is over tuples (n_1,...) with sum j*n_j = n and |ns| = sum n_j.
+        Recipes are cached per order to avoid recomputation across evaluations.
         """
         if not name:
             name = f"({self.name})^-1"

@@ -6,7 +6,6 @@
 
 from sage.all import *
 
-
 ############################
 ##### TYPES PRECISION ######
 ############################
@@ -16,10 +15,10 @@ CBF = ComplexBallField(prec)
 
 
 ############################
-## USED TO COMPUTE BOUNDS ##
+## BY DEFECT ##
 ############################
-REL_TOL_1D = RBF(10)**(-4)
-ABS_TOL_1D = RBF(10)**(-6)
+REL_TOL = RBF(10)**(-4)
+ABS_TOL = RBF(10)**(-6)
 MAX_ITERATIONS = 2**18
 MAX_SUBINTERVALS = 2**15
 
@@ -28,8 +27,9 @@ MAX_SUBINTERVALS = 2**15
 ###### PRINTING INFOR ######
 ############################
 VERBOSE = 1      # Quantity of printed information, from 0 to 2. (o prints nothing while 2 the most).
+VERBOSE_COUNTER   = 40  # for treatment of J = (N,n) blocks 
+V3R8053_C0UN73R = 512 # for integrals and image computators
 PRINT_DIGITS = 20
-PRINT_EACH = 512
 
 
 ############################
@@ -41,6 +41,15 @@ ONE_DIV_2 = 1 / TWO
 ONE_DIV_135 = 1/RBF(135)
 ZERO = RBF(0)
 PI=RBF(pi)
+MPI=-PI
+TWOPI = TWO*PI
+ONE = RBF(1)
+SQRT2 = TWO**ONE_DIV_2
+
+# ODE domain parameters
+LEFT_DOM = MPI
+LEN_DOM = TWOPI
+
 
 
 # In[ ]:

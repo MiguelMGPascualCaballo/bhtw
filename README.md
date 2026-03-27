@@ -1,28 +1,60 @@
+## Note
+
+The descriptions in this README correspond to a forthcoming version of the project and may not fully match the current contents of the repository. In addition, the documentation is not yet complete and will be expanded in future updates.
+
 ## Data files
 
+All data files are located in the `supplementary_data/` directory and are provided as plain text files and readen by `load_data.py` routines.
 
 ### `tw_data.txt`
 
-Plain text file.
+- Read with `_load_tab_data()`.
+- The first value is the traveling wave speed.
+- The remaining values are the traveling wave coefficients.
 
-- Single row with 1001 space-separated values.
-- Value 0: traveling wave speed.
-- Values 1–1000: cosine Fourier coefficients of the traveling wave.
+### `*_resis.txt`
 
-This file provides the numerical data defining the approximate traveling wave used throughout the computer-assisted proofs.
+- Read with `_load_tab_data()`.
+- Upper error bounds for the difference between certain functions of the paper and their numerical approximations.
+
+### `gk_Linf_bounds.txt`
+
+- Read with `_load_tab_data()`.
+
+### `eigen_data.txt`
+
+- Read with `_load_tab_data_complex()`.
+- The first line contains \( \lambda^{\rm ap} \).
+- The second line contains \( 1.035i \).
+
+### `*_V.txt`
+
+- Read with `_load_tab_data_complex()`.
+- Each file contains an approximation of the \( V \) factor in the singular value decomposition of a corresponding matrix.
+- The entries are provided with up to \( 30 \) decimal digits of precision.
+- `sing_V.txt` is also used in the construction of the function \( f^{\rm ap} \).
+
+### `sing_u1.txt`
+
+- Read with `_load_tab_data_complex()`.
+- Approximation of the left singular vector \( u_1 \) associated to the smallest singular value of \( M^{\rm tor}_{\rm stab} \). 
 
 ### `polynomial_zeros.txt`
 
-Plain text file.
+- Read with `_load_tab_data_complex()`.
+- Approximation of the zeros of \( z^N P(z) \) contained in the open unit disc.
 
-- 1000 rows.
-- Each row contains two space-separated values.
-- The two values correspond to the real and imaginary parts of a zero of the polynomial $z^N P(z)$, where $N = 1000$.
+### `exis_data.txt`
 
-Only the zeros contained in the open unit disc are listed. These approximations are used as initial guesses for the rigorous root enclosure procedures.
+- Read with `_ode_values()`.
 
+### `*_p_data.txt` and `*_m_data.txt`
 
+- Read with `_ode_values()` and restructured with `_stab_fixed()`.
 
+### `BOUNDS.txt`
+
+- Read with `load_bounds()`.
 
 ## Python source files
 

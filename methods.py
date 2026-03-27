@@ -5,7 +5,7 @@
 
 
 from sage.all import *
-from parameters import *
+from parameters import RBF, ONE_DIV_2, SQRT_1_DIV_3, ONE_DIV_135, ZERO
 
 
 # In[ ]:
@@ -25,7 +25,7 @@ class integral_1D:
         
         
     @classmethod
-    def Gauss_Legendre_quad_order2_constructor(cls):
+    def gauss_lege_2dots(cls):
         """
         2-point Gauss–Legendre enclosure with a remainder term using the 4th derivative:
 
@@ -37,7 +37,7 @@ class integral_1D:
             func.derivatives[4] must exist and accept an interval RBF([a,b]).
         """
         
-        def Gauss_Legendre_quad_order2(x, func):
+        def Gauss_Legendre_quad_order2(x, func, half=ONE_DIV_2, w3=SQRT_1_DIV_3, o135=ONE_DIV_135):
             """
             Computes the Gauss–Legendre quadrature enclosure over an interval.
 
@@ -50,14 +50,14 @@ class integral_1D:
             """
             a, b = x
             X = RBF([a, b])
-            x0 = (a + b) * ONE_DIV_2
-            rr = (b - a) * ONE_DIV_2
+            x0 = (a + b) * half
+            rr = (b - a) * half
 
-            f1 = func(x0 - rr * SQRT_1_DIV_3)
-            f2 = func(x0 + rr * SQRT_1_DIV_3)
+            f1 = func(x0 - rr * w3)
+            f2 = func(x0 + rr * w3)
             f4 = func.derivatives[4](X)
 
-            return rr * (f1 + f2) + (rr**5) * f4 * ONE_DIV_135
+            return rr * (f1 + f2) + (rr**5) * f4 * o135
 
         return cls(Gauss_Legendre_quad_order2)
 
@@ -83,7 +83,7 @@ class image_1D:
         self.order = order
 
     @classmethod
-    def kth_order_method_constructor(cls, kk):
+    def taylor_method(cls, kk):
         """
         Taylor enclosure of order kk around the midpoint x0=(a+b)/2.
 
@@ -95,7 +95,7 @@ class image_1D:
             odd  j: [-rr, rr]^j
         """
 
-        def method(x, func, order=kk):
+        def method(x, func, order=kk, half=ONE_DIV_2):
             a, b = x
             X = RBF([a, b])
             x0 = (a + b) * ONE_DIV_2
