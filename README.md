@@ -1,10 +1,11 @@
 ## Note
 
-The descriptions in this README correspond to a forthcoming version of the project and may not fully match the current contents of the repository. In addition, the documentation is not yet complete and will be expanded in future updates.
+Some large data files listed below are not included in the repository and are available on Zenodo: https://doi.org/10.5281/zenodo.19250315.
+They must be placed in `supplementary_data/`.
 
 ## Data files
 
-All data files are located in the `supplementary_data/` directory and are provided as plain text files and readen by `load_data.py` routines.
+All data files are located in the `supplementary_data/` directory and are provided as plain text files and read by the routines in `load_data.py`.
 
 ### `tw_data.txt`
 
@@ -13,6 +14,8 @@ All data files are located in the `supplementary_data/` directory and are provid
 - The remaining values are the traveling wave coefficients.
 
 ### `*_resis.txt`
+
+(e.g. `exis_resis.txt`, `sing_resis.txt`, `regu_resis.txt`, `Jfv_resis.txt`)
 
 - Read with `_load_tab_data()`.
 - Upper error bounds for the difference between certain functions of the paper and their numerical approximations.
@@ -29,10 +32,13 @@ All data files are located in the `supplementary_data/` directory and are provid
 
 ### `*_V.txt`
 
+(e.g. `exis_V.txt`, `sing_V.txt`, `regu_V.txt`)
+
 - Read with `_load_tab_data_complex()`.
 - Each file contains an approximation of the \( V \) factor in the singular value decomposition of a corresponding matrix.
 - The entries are provided with up to \( 30 \) decimal digits of precision.
 - `sing_V.txt` is also used in the construction of the function \( f^{\rm ap} \).
+- Not included in the repository, available on Zenodo.
 
 ### `sing_u1.txt`
 
@@ -47,14 +53,19 @@ All data files are located in the `supplementary_data/` directory and are provid
 ### `exis_data.txt`
 
 - Read with `_ode_values()`.
+- Not included in the repository, available on Zenodo.
 
 ### `*_p_data.txt` and `*_m_data.txt`
 
-- Read with `_ode_values()` and restructured with `_stab_fixed()`.
+(e.g. `sing_p_data.txt`, `sing_m_data.txt`, `regu_p_data.txt`, `regu_m_data.txt`, `Jfv_p_data.txt`, `Jfv_m_data.txt`)
 
-### `BOUNDS.txt`
+- Read with `_ode_values()` and restructured with `_stab_fixed()`.
+- Not included in the repository, available on Zenodo.
+
+### `bounds.txt`
 
 - Read with `load_bounds()`.
+- Every remaining bound used in the paper.
 
 ## Python source files
 
@@ -62,90 +73,49 @@ All data files are located in the `supplementary_data/` directory and are provid
 
 Main execution script reproducing all computer-assisted results.
 
-- Loads the traveling-wave data from `tw_data.txt` and polynomial root approximations from `polynomial_zeros.txt`.
 - Calls the verification routines defined in `lemmas.py`.
-- Outputs timing information and verification status for each lemma.
+- Outputs timing information and verification status for each lemma and the last routine, which verifies that every substitution along the paper is correct.
 
 Running this script reproduces all computer-assisted checks reported in the paper.
-**Important:** this script must be run in a **SageMath-enabled Python environment**, since it imports `sage.all` and uses Sage’s Arb-based ball arithmetic (`RealBallField`, `ComplexBallField`).
-
-### `script.ipynb`
-
-Jupyter notebook version of `script.py`.
-
-- Contains the same workflow as `script.py`, but organized into notebook cells.
-- Useful for interactive inspection of intermediate quantities (e.g. partial bounds, progress prints, timings).
-- Reproduces the same certified checks by calling the same routines in lemmas.py.
-
-**Important**: the notebook must be executed with a **SageMath kernel** (or a Jupyter setup configured to use Sage), because it relies on `sage.all` and Arb ball arithmetic types.
+**Important:** this script must be run in a **SageMath-enabled Python environment**. In particular, `from sage.all import *` must work.
 
 ### `lemmas.py`
 
-High-level computer-assisted lemmas corresponding directly to statements in the paper.
-
-- Verification of norm bounds, supremum bounds, and integral estimates.
-- Root enclosure and compatibility checks for the polynomial $z^N P(z)$.
-- Wrapper routines that compare rigorous enclosures with the bounds stated in the lemmas.
-
-Each function in this file corresponds to a specific lemma in the Appendix.
-
+Each function in this file corresponds to a specific lemma in the Appendix, except for the last one, which checks that all substitutions in the paper are correct.
 
 ### `auxiliar_funcs.py`
 
 Generic and reusable adaptive verification algorithms.
 
-- Adaptive subdivision for supremum bounds.
-- Adaptive integration drivers for one-dimensional integrals.
-- Input/output sanity checks to prevent loss of rigor or precision.
-
-These routines implement the core logic shared by many computer-assisted lemmas.
-
-
 ### `methods.py`
 
-Local enclosure methods used by adaptive algorithms.
-
-- Taylor model image enclosures of arbitrary order.
-- Gauss–Legendre quadrature with rigorous remainder terms.
-- Callable wrappers used by adaptive integration and supremum verification routines.
-
-This file contains reusable numerical methods independent of any specific lemma.
-
+Reusable numerical methods independent of any specific lemma.
 
 ### `explicit_funcs.py`
 
-Defines explicit mathematical objects used in the computer-assisted proofs.
+Functions and routines relative to our problem. 
 
-- Construction of functions represented as `Functions_1D objects`.
-- Explicit adaptive integration routines: `iota_L1_compute_adaptive`.
+### `verify.py`
 
-These routines build the functions and integrands that are later verified by higher-level lemmas.
-
-
+Helper functions used to verify that everything works correctly and avoid silent bugs.
 
 ### `parameters.py`
 
 Defines all global numerical parameters used in the computations.
 
-- Working precision and real/complex ball fields.
-- Default absolute and relative tolerances for adaptive algorithms.
-- Maximum iteration and subdivision limits.
-- Numerical constants used throughout the code.
-  
-This file centralizes all numerical settings to ensure consistency and reproducibility.
-
+- VERBOSE controls the amount of printed information.
 
 ### `printing_macros.py`
 
-Utility functions for formatted output.
+Helper functions to print progress and status of the proof.
 
-- Orientative printing of real and complex ball numbers.
-- Helper functions for displaying intermediate and final results.
-- This file has no mathematical content and is only used for readable output.
-  
-This file has no mathematical content and is only used for readable output
+### `load_data.py`
 
+The routines in this file read the data from the `supplementary_data/`.
 
+### `classes.py`
 
+Utility classes used to simplify parts of the code.
 
-
+- FourierRealSeries
+- Functions_1D

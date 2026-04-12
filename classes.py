@@ -1,20 +1,20 @@
 #!/usr/bin/env python
 # coding: utf-8
 
-# In[9]:
+# In[1]:
 
 
 from sage.all import *
 from sage.rings.real_arb import RealBall
 
-import matplotlib.pyplot as plt
-from sage.combinat.partition import Partitions
-from itertools import product
-from matplotlib import patches
+from printing_macros import print_RBF
+from parameters import ZERO, ONE_DIV_2, TWO, RBF, PI
 
-from printing_macros import *
-from parameters import *
-from auxiliar_funcs import *
+
+# In[ ]:
+
+
+
 
 
 # In[2]:
@@ -338,7 +338,7 @@ class FourierRealSeries:
 
             return FourierRealSeries(new_mean, new_cos, new_sin) 
         
-        raise TypeError("Trying to multiplicate with not RBF/FourierRealSeries data.")
+        raise TypeError("Trying to multiply with not RBF/FourierRealSeries data.")
     
     def __rmul__(self, other):
         """Multiplying from the right."""
@@ -925,7 +925,7 @@ class Functions_1D:
                 
         raise TypeError(
             f"'other' is not a RealBall or Functions_1D. "
-            f"Trying to add a {type(other)}."
+            f"Trying to multiply by a {type(other)}."
         )
 
     

@@ -43,7 +43,7 @@ vthem|            |0.770135|     |apprx|
 
 
 # Used in Section
-Jfvu1|            |4.544150e-2|   |lower|   NON RIGOROUS RIGHT NOW, JUST APPROXIMATED
+Jfvu1|            |4.54415e-2|   |lower|   NON RIGOROUS RIGHT NOW, JUST APPROXIMATED
 
 # Used in Appendix C
 radii_roots|      |1e-41|        |upper|   Radii of the discs enclosing the roots of P

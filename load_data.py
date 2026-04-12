@@ -6,7 +6,6 @@
 
 from sage.all import *
 from collections import deque
-from dataclasses import dataclass
 from parameters import RBF, CBF, ZERO, ONE, ONE_DIV_2, LEN_DOM, LEFT_DOM
 
 fold = "supplementary_data/"
@@ -35,6 +34,10 @@ def theta():
     return 1 / RBF(3)
 
 def eigen_fv():
+    """
+    Returns Fourier coefficients in order:
+    [0,1,...,N-1,-1,...,-N]
+    """
     V = ode_stab_sing_stepmat()
     
     len_v1_trunc = V.nrows()-2
@@ -311,8 +314,8 @@ def _const_sols_0_x(blocks_deque, len_coeffs, sign):
         new_hom_values = _new_hom_values_comp(last_hom_val, hom_values, rr_eff)
         last_hom_val = _eval_sol(rr_eff, new_hom_values)
 
-        # Affine pieces
-        sol_values = []
+        # Affine pieces; carries the right-endpoint value forward to the next block
+        sol_values = [] 
         for idx, aff_values in enumerate(values[1:]):
             last_aff_val = last_aff_values[idx]
             new_aff_values = _new_aff_values_comp(last_aff_val, hom_values, aff_values, rr_eff)

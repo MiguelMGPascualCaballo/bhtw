@@ -9,7 +9,11 @@ This module is used to format prints.
 """
 from sage.rings.real_arb import RealBall
 from sage.rings.complex_arb import ComplexBall
-from parameters import PRINT_DIGITS, VERBOSE, VERBOSE_COUNTER, V3R8053_C0UN73R
+from parameters import (
+    PRINT_DIGITS, VERBOSE, 
+    VERBOSE_COUNTER_J, VERBOSE_COUNTER_I, VERBOSE_COUNTER_N, 
+    SHOW_ABCDE
+)
 
 
 # In[10]:
@@ -50,6 +54,16 @@ def print_lemma(verified, lemma_label, bounds, elapsed):
 # In[ ]:
 
 
+def print_subst(verified, description):
+    if verified:
+        print(f"Every substitution is OK.")
+    else:
+        print(description)
+
+
+# In[ ]:
+
+
 def print_time(total_seconds):
     three_thou_six_hund = 3600
     sixty = 60
@@ -72,7 +86,7 @@ def print_time(total_seconds):
 # In[ ]:
 
 
-def print_iter(counter, text=None, verbose=VERBOSE, verb_count=VERBOSE_COUNTER):
+def print_iter_J(counter, text=None, verbose=VERBOSE, verb_count=VERBOSE_COUNTER_J):
     if not verbose:
         return
 
@@ -90,7 +104,7 @@ def print_iter(counter, text=None, verbose=VERBOSE, verb_count=VERBOSE_COUNTER):
 # In[ ]:
 
 
-def print_adapt_inter(tot_iters, tot_ivals, verified_domain, result=None, verbose=VERBOSE, verb_count=V3R8053_C0UN73R):
+def print_iter_I(tot_iters, tot_ivals, verified_domain, result=None, verbose=VERBOSE, verb_count=VERBOSE_COUNTER_I):
     if not verbose:
         return
 
@@ -103,4 +117,37 @@ def print_adapt_inter(tot_iters, tot_ivals, verified_domain, result=None, verbos
         msg += f", result: {result}"
 
     print(msg, flush=True)
+
+
+# In[ ]:
+
+
+def print_iter_N(counter, text=None, verbose=VERBOSE, verb_count=VERBOSE_COUNTER_N):
+    print_iter_J(counter, text=None, verbose=verbose, verb_count=verb_count)
+
+
+# In[ ]:
+
+
+def print_check(str_in, verbose=VERBOSE):
+    """prints str_in if VERBOSE and returns True"""
+    if verbose:
+        print(f"    Structure check passed: {str_in}.")
+    return True
+
+
+# In[ ]:
+
+
+def print_abcde(vthep, vthem, L2_00, L2_pp, L2_mm, L2_0p, L2_0m):
+    """Prints information to get a good choice of vthep and vthem"""
+    if VERBOSE and SHOW_ABCDE:
+        print('used vp=',vthep)
+        print('used vm=',vthem)
+    
+        print('L2_00', L2_00, 'a')
+        print('L2_pp', L2_pp, 'b')
+        print('L2_mm', L2_mm, 'c')
+        print('L2_0p', L2_0p, 'd')
+        print('L2_0m', L2_0m, 'e')
 

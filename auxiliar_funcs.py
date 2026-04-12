@@ -12,11 +12,11 @@ from collections import deque
 
 from parameters import (
     RBF, CBF,
-    ZERO, TWO, PI, ONE_DIV_2, SQRT_1_DIV_3, ONE_DIV_135,
-    VERBOSE, V3R8053_C0UN73R,
+    ZERO, PI, ONE_DIV_2, SQRT_1_DIV_3, ONE_DIV_135,
+    VERBOSE, VERBOSE_COUNTER_I,
     ABS_TOL, REL_TOL, MAX_ITERATIONS, MAX_SUBINTERVALS,
 )
-from printing_macros import print_RBF, print_adapt_inter
+from printing_macros import print_RBF, print_iter_I
 from load_data import interval_from_J
 import verify
 
@@ -52,7 +52,7 @@ def prod_vector(u, v):
 
 def build_CS_for_jj(jj, Rk, x0, rr):
     """
-    Computes the Taylor-like moment lists C and S of orders 0..Rk for the interval
+    Computes the Taylor-like moment lists C and S of orders 0...Rk for the interval
     [x0-rr, x0+rr] and frequency jj, defined by:
         C[l] = ∫_{x0-rr}^{x0+rr} (x-x0)^l cos(jj*x) dx
         S[l] = ∫_{x0-rr}^{x0+rr} (x-x0)^l sin(jj*x) dx
@@ -108,7 +108,7 @@ def build_CS_for_jj(jj, Rk, x0, rr):
 # In[ ]:
 
 
-def precompute_expo_vals(J, n_min, total, max_Nk):
+def precompute_expo_vals(J, n_min, total, poly_ord_p1):
     """
     Precomputes the CBF matrix expo_vals of shape (total-n_min) x max_Nk, where
         expo_vals[jj-n_min, kk] = C[kk] - i*S[kk]
@@ -117,11 +117,11 @@ def precompute_expo_vals(J, n_min, total, max_Nk):
     """
     _, _, x0, rr = interval_from_J(J)
     
-    expo_vals = matrix(CBF, total - n_min, max_Nk)
+    expo_vals = matrix(CBF, total - n_min, poly_ord_p1)
     for jj in range(n_min, total):
         idx_jj = jj-n_min 
-        C, S = build_CS_for_jj(jj, max_Nk, x0=x0, rr=rr)
-        for kk in range(max_Nk):
+        C, S = build_CS_for_jj(jj, poly_ord_p1 - 1, x0=x0, rr=rr)
+        for kk in range(poly_ord_p1):
             expo_vals[idx_jj, kk] = C[kk] - I*S[kk]
 
     return expo_vals
@@ -198,8 +198,8 @@ def S_from_ti_S_for_Gersh(ti_S, M, V):
         row_base = s1 * Mvj + base_error
         for kk, Mvk in enumerate(MV_norms):
             term = ti_S[jj, kk]
-            rr = row_base + s1 * Mvk
-            S[jj, kk] = term.add_error(rr)
+            error_rad = row_base + s1 * Mvk
+            S[jj, kk] = term.add_error(error_rad)
 
     return S
 
@@ -285,7 +285,7 @@ def max_prev_esti(
     max_iterations=MAX_ITERATIONS,
     max_subintervals=MAX_SUBINTERVALS,
     verbose=VERBOSE,
-    verb_count=V3R8053_C0UN73R
+    verb_count=VERBOSE_COUNTER_I
 ):
     """
     Verifies an a priori supremum bound using adaptive domain subdivision.
@@ -355,7 +355,7 @@ def max_prev_esti(
         current_iterations += 1
 
         # Optional progress output
-        print_adapt_inter(current_iterations, len(intervals), verified_domain, verbose=verbose, verb_count=verb_count)
+        print_iter_I(current_iterations, len(intervals), verified_domain, verbose=verbose, verb_count=verb_count)
 
         # Pop a subinterval and compute an enclosure of func on it
         x = intervals.pop()
@@ -386,13 +386,6 @@ def max_prev_esti(
         if current_iterations > max_iterations:
             raise RuntimeError("MAX_ITERATIONS_REACHED")
 
-    # Optional progress output
-    if verbose:
-        print(
-            f" Total intervals: {len(intervals)}.\n Total iterations: {current_iterations}.\n Progress: {verified_domain.mid():.4f}.\n"
-        )
-        
-    # If we exit the loop, every subinterval has been verified
     return True
 
 
@@ -406,7 +399,7 @@ def integ_adaptive_1D(
     max_iterations=MAX_ITERATIONS,
     max_subintervals=MAX_SUBINTERVALS,
     verbose=VERBOSE,
-    verb_count=V3R8053_C0UN73R
+    verb_count=VERBOSE_COUNTER_I
 ):
     """
     Computes an enclosure of a one-dimensional quantity using adaptive subdivision.
@@ -477,7 +470,7 @@ def integ_adaptive_1D(
     while intervals:
 
         # Optional progress output
-        print_adapt_inter(current_iterations, len(intervals), verified_domain, result=print_RBF(result), verbose=verbose, verb_count=verb_count)
+        print_iter_I(current_iterations, len(intervals), verified_domain, result=print_RBF(result), verbose=verbose, verb_count=verb_count)
 
         # Take the next interval
         x = intervals.pop()
@@ -521,12 +514,6 @@ def integ_adaptive_1D(
         elif current_iterations > max_iterations:
             fallback_mode = True
             print("MAX_ITERATIONS reached — entering fallback mode.")
-
-    # Optional progress output
-    if verbose:
-        print(
-            f" Total intervals: {len(intervals)}.\n Total iterations: {current_iterations}.\n Progress: {verified_domain.mid():.4f}.\n"
-        )
     
     return result
 
@@ -540,7 +527,7 @@ def triangular_integral(
     abs_tol=ABS_TOL,
     max_iterations=MAX_ITERATIONS,
     verbose=VERBOSE,
-    verb_count=V3R8053_C0UN73R
+    verb_count=VERBOSE_COUNTER_I
 ):
     """
     Adaptive enclosure for an integral of the form:
@@ -601,7 +588,7 @@ def triangular_integral(
         current_iterations += 1
 
         # Optional progress output
-        print_adapt_inter(current_iterations, len(intervals), verified_domain, result=print_RBF(result), verbose=verbose, verb_count=verb_count)
+        print_iter_I(current_iterations, len(intervals), verified_domain, result=print_RBF(result), verbose=verbose, verb_count=verb_count)
 
         if current_iterations > max_iterations:
             raise RuntimeError("MAX_ITERATIONS reached (no fallback).")
@@ -694,13 +681,8 @@ def triangular_integral(
 
         ############################################################
         # Acceptance / refinement
-        ############################################################
-
-        c_y_abs = y.squash().abs()
         r_y = RBF(y.rad())
-
         crit_abs = r_y < abs_tol * rr
-
         if crit_abs:
             # IMPORTANT: update last_value to gap(a),
             # because next interval (to the left) has right endpoint = a
@@ -717,12 +699,6 @@ def triangular_integral(
         # push left THEN right so right is processed next (.pop())
         intervals.append(xl)
         intervals.append(xr)
-
-    # Optional progress output
-    if verbose:
-        print(
-            f" Total intervals: {len(intervals)}.\n Total iterations: {current_iterations}.\n Progress: {verified_domain.mid():.4f}.\n"
-        )
 
     return result
 

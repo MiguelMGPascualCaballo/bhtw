@@ -15,6 +15,7 @@ from parameters import (
 )
 import load_data
 import verify
+from printing_macros import print_iter_N, print_abcde
 
 BOUNDS, BOUNDS_STR = load_data.load_bounds()
 
@@ -340,10 +341,10 @@ def enclose_roots():
         for _, other_root_enclo in list_roots:
             len_pair = (root_enclo-other_root_enclo).abs()
             pair_dist = pair_dist.min(len_pair)
-            
-        ind_verbo = 100
-        if len(roots) % ind_verbo == ind_verbo-1 and VERBOSE:
-            print(len(roots), len_dis, circ_dist)
+
+        counter = rk - len(list_roots)
+        print_iter_N(counter, text=f"{len(list_roots)}")
+        
 
     #######################################
     # Final conditions:
@@ -890,7 +891,7 @@ def kappa4():
 # In[ ]:
 
 
-def hk_norm_exis_H2sq(): # If estimations do not close the argument, improve this by h'' = b' g + b g' + i b' h + i b h' usng the residuals 
+def hk_norm_exis_H2sq():
 
     #######################################
     # Output information
@@ -908,53 +909,28 @@ def hk_norm_exis_H2sq(): # If estimations do not close the argument, improve thi
     
     betamod_L2sq = BOUNDS['beta_mod']
     betamax      = BOUNDS['beta_max']
-    kappa1       = BOUNDS['kappa1']
     kappa2       = BOUNDS['kappa2']
     hkH2sq_save  = BOUNDS['hkH2']
 
     #######################################
 
-    def compute_hk_norms(hknorms_sq, residue_sq):
-        """ We add the residual part """
-        half = ONE_DIV_2
-        assert len(hknorms_sq) == len(residue_sq)-1 #          N         N + 1
-        return [(a**half + b**half)**2 for a, b in zip(hknorms_sq, residue_sq)] # We only add k less than N+1, zip truncates to the smallest
-
-    #######################################
     domain = [ZERO, PI]
-    int_order = 4
-    ima_order = 2
-    int_method = integral_1D.gauss_lege_2dots()
-    ima_method = image_1D.taylor_method(ima_order)
-
-    print('STARTING',flush=True)
+    order = 2
+    method = image_1D.taylor_method(order)
     half = ONE_DIV_2
-    rel_tol=RBF('1e-2') # '1e-2'
-    abs_tol=RBF('1') # '1e-2'
-    check_bounds = False
-    if check_bounds:
-        # Construct integrand
-        integrand = beta_dx_func_sq_constructor(speed, coeffs, int_order)
-        beta_dx_L2sq = 2 * auxiliar_funcs.integ_adaptive_1D(domain, integrand, int_method, abs_tol=abs_tol, rel_tol=rel_tol)
-        verify.o(beta_dx_L2sq)
-    
-        # Check that gkLnfr are bounds of the real part of the gk funcs
-        real_gk_funcs = real_gk_funcs_constructor(coeffs, ima_order)
-        print('len(gkLnfr)=',len(gkLnfr))
-        assert len(real_gk_funcs) == len(gkLnfr)
-        for kk, (func, bound) in enumerate(zip(real_gk_funcs, gkLnfr), start=1):
-            cond1 = auxiliar_funcs.max_prev_esti(domain,        func, bound, ima_method, verbose=0)
-            cond2 = auxiliar_funcs.max_prev_esti(domain, (-ONE)*func, bound, ima_method, verbose=0)
-    
-            if VERBOSE and kk % 100 == 0:
-                print('kk=',kk,flush=True)
-    
-            if not cond1 or not cond2:
-                raise ValueError(
-                    f"Function g{kk} fails: {cond1} and {cond2}"
-                )
-    else:
-        beta_dx_L2sq =RBF('5693.1871')
+
+    real_gk_funcs = real_gk_funcs_constructor(coeffs, order)
+    assert len(real_gk_funcs) == len(gkLnfr)
+    for kk, (func, bound) in enumerate(zip(real_gk_funcs, gkLnfr), start=1):
+        cond1 = auxiliar_funcs.max_prev_esti(domain,        func, bound, method, verbose=0)
+        cond2 = auxiliar_funcs.max_prev_esti(domain, (-ONE)*func, bound, method, verbose=0)
+
+        print_iter_N(kk, text=f'{kk}')
+
+        if not cond1 or not cond2:
+            raise ValueError(
+                f"Function g{kk} fails: {cond1} and {cond2}"
+            )
         
     #######################################
 
@@ -985,9 +961,6 @@ def hk_norm_exis_H2sq(): # If estimations do not close the argument, improve thi
         I1ac += I1sq; I2ac += I2sq; I3ac += I3sq;
         acc_sq_norm += sum(x**half for x in II)**2
 
-    print('I1ac=',I1ac)
-    print('I2ac=',I2ac)
-    print('I3ac=',I3ac)
     assert verify.o(acc_sq_norm)
     
     verified = acc_sq_norm < hkH2sq_save
@@ -1238,11 +1211,6 @@ def svd_sing(): # checked, to recheck when resiis checked
     ti_S = aux_diag.conjugate().transpose()*aux_diag 
     M = mat_thin.conjugate().transpose() * mat_thin
     S = auxiliar_funcs.S_from_ti_S_for_Gersh(ti_S, M, step_mat_V)
-
-    if VERBOSE:
-        print('perturb=',perturb)
-        print('end ti_S=',ti_S[-2:,-2:])
-        print('end    S=',   S[-2:,-2:])
     
     svd1_comp, svd2_comp = auxiliar_funcs.gersh_gap_one_two(S)
 
@@ -1311,25 +1279,16 @@ def prod_fv_u1():
     xi_resi = MRu + RMu + RRu
     
     xi_u1 = 2*(xi_thin + xi_resi)
-    
-    if VERBOSE:
-        print('xi_thin=',xi_thin)
-        print('xi_resi=',xi_resi)
-        print('xi_u1=',xi_u1)
 
     #######################################
     # Estimate delta
     gap = sv2_sq_low - sv1_sq_upp
     de = (2**ONE_DIV_2) * xi_u1 / gap
-    if VERBOSE:
-        print('de=',de)
 
     #######################################
     # Construct bfv and compute the approximate product
     bfv = bfv_constructor(Jfv_values, nm1, ord_mat)
     ap_prod = auxiliar_funcs.prod_vector(bfv, u1_ap)
-    if VERBOSE:
-        print('ap_prod=',ap_prod.abs())
     
     #######################################
     # Compute bfvap := b(Fap+,Fap-)
@@ -1443,9 +1402,6 @@ def ode_resis_regu(packed=None):
     assert verify.oo(residues_sq, len(ode_bounds))
     
     verified = all(uk < vk for uk, vk in zip(residues_sq, ode_bounds))
-    failed_indices = [(kk, uk, vk) for kk, (uk, vk) in enumerate(zip(residues_sq, ode_bounds)) if not (uk < vk)]
-    if VERBOSE:
-        print('failed_indices=', failed_indices)
     return verified, lemma_label, bounds
     
 
@@ -1579,12 +1535,14 @@ def substituting_estimates():
 
     zet2 = PI**2 / RBF(6)
     theta = load_data.theta()
+    half = ONE_DIV_2
 
     #######################################
     # --- Section 2, Proposition 2.5 ---
-    rad_exis =  BOUNDS['rad_exis']
+    rad_exis = BOUNDS['rad_exis']
+    ell_exis = BOUNDS['lip_exis']
     
-    qua = (2*zet2)**ONE_DIV_2
+    qua = (2*zet2)**half
     lin = BOUNDS['Lexis_inv']
     aff = BOUNDS['resi_exis_L2']
     
@@ -1593,11 +1551,10 @@ def substituting_estimates():
 
     discriminant = 1 - 4 * aa * qq
 
-    minimal_rad = (1 - discriminant**ONE_DIV_2) / (2*qq)
-    maximal_rad = (1 + discriminant**ONE_DIV_2) / (2*qq)
+    minimal_rad = (1 - discriminant**half) / (2*qq)
+    maximal_rad = (1 + discriminant**half) / (2*qq)
 
-    if VERBOSE:
-        print('minimal_rad=',minimal_rad)
+    verify.o(minimal_rad)
 
     xx = rad_exis
 
@@ -1605,7 +1562,11 @@ def substituting_estimates():
     cont_cond = cont_exis < xx
     
     lips_exis = 2 * qq * xx
-    lips_cond = lips_exis < 1
+    lips_cond = lips_exis < ell_exis
+
+    verify.o(minimal_rad)
+    verify.o(cont_exis)
+    verify.o(lips_exis)
 
     add_check(discriminant > 0, f"Texis discriminant not positive: {discriminant}")
     add_check(cont_cond, f"Radius for Texis not valid: {cont_exis} not less than {xx}")
@@ -1615,25 +1576,21 @@ def substituting_estimates():
     # --- Corollary 3.5 ---
     Dthe_save = BOUNDS['Dthe_op']
     
-    coef = 2 * zet2**ONE_DIV_2 * (1 + theta**2)**ONE_DIV_2
+    coef = 2 * zet2**half * (1 + theta**2)**half
     Dthe_comp = coef * rad_exis
     assert verify.o(Dthe_comp)
-    if VERBOSE:
-        print('Dthe_comp=',Dthe_comp)
 
     add_check(Dthe_comp < Dthe_save, f"Dthe norm not valid: {Dthe_comp} not less than {Dthe_save}")    
 
     #######################################
     # --- Corollary 4.23 ---
     C1 = BOUNDS['beta_max']
-    C2 = (BOUNDS['beta_mod'] * PI / RBF(12))**ONE_DIV_2
-    C3 = BOUNDS['kappa2']**ONE_DIV_2
+    C2 = (BOUNDS['beta_mod'] * PI / RBF(12))**half
+    C3 = BOUNDS['kappa2']**half
     JH1H2_save = BOUNDS['JH1H2']
 
     JH1H2_comp = C1 + C2 + C3
 
-    if VERBOSE:
-        print('JH1H2_comp=',JH1H2_comp)
     assert verify.o(JH1H2_comp)
     add_check(JH1H2_comp < JH1H2_save, f"Jexis H1-H2 norm not valid: {JH1H2_comp} not less than {JH1H2_save}")    
     
@@ -1647,17 +1604,15 @@ def substituting_estimates():
     L_inv_save   = BOUNDS['Lexis_inv']
 
     # C1^2 := JL2L2^2 / s1^2  sum norm(dx^2 hk)^2
-    C1 = (kappa1_sq * hkH2_sq / svd1_exis_sq)**ONE_DIV_2
+    C1 = (kappa1_sq * hkH2_sq / svd1_exis_sq)**half
     
     # C2 := JH1H2
     C2 =  JH1H2
 
     # C3 := C1 / sqrt(2 pi) + C2
-    aux_PI = (2 * PI)**ONE_DIV_2
+    aux_PI = (2 * PI)**half
     L_inv_comp = C1 / aux_PI + C2
 
-    if VERBOSE:
-        print('L_inv_exis=',L_inv_comp)
     assert verify.o(L_inv_comp)
     add_check(L_inv_comp < L_inv_save, f"L_inv_exis norm not valid: {L_inv_comp} not less than {L_inv_save}")    
 
@@ -1669,12 +1624,9 @@ def substituting_estimates():
     J1p_save = BOUNDS['J1p']
     J1m_save = BOUNDS['J1m']
     
-    J1p_comp = kappa4p**ONE_DIV_2 + beta_max
-    J1m_comp = kappa4m**ONE_DIV_2 + beta_max
+    J1p_comp = kappa4p**half + beta_max
+    J1m_comp = kappa4m**half + beta_max
 
-    if VERBOSE:
-        print('J1p_comp=',J1p_comp)
-        print('J1m_comp=',J1m_comp)
     assert verify.o(J1p_comp)
     assert verify.o(J1m_comp)
     add_check(J1p_comp < J1p_save, f"Jp L2-H1 norm not valid: {J1p_comp} not less than {J1p_save}")  
@@ -1693,14 +1645,14 @@ def substituting_estimates():
 
     sv2 = BOUNDS['svd_stab2']
 
-    aux_coef = (CJ0 / (sv2 * TWOPI) )**ONE_DIV_2
-    ti_C0p_00 = aux_coef * C0p**ONE_DIV_2
-    ti_C0m_00 = aux_coef * C0m**ONE_DIV_2
-    ti_C1p_00 = aux_coef * C1p**ONE_DIV_2
-    ti_C1m_00 = aux_coef * C1m**ONE_DIV_2
+    aux_coef = (CJ0 / (sv2 * TWOPI) )**half
+    ti_C0p_00 = aux_coef * C0p**half
+    ti_C0m_00 = aux_coef * C0m**half
+    ti_C1p_00 = aux_coef * C1p**half
+    ti_C1m_00 = aux_coef * C1m**half
 
-    ti_C0p_0p = CJ0**ONE_DIV_2
-    ti_C0m_0m = CJ0**ONE_DIV_2
+    ti_C0p_0p = CJ0**half
+    ti_C0m_0m = CJ0**half
     ti_C1p_1p = CJp
     ti_C1m_1m = CJm 
 
@@ -1714,26 +1666,16 @@ def substituting_estimates():
 
     vthep = BOUNDS['vthep']
     vthem = BOUNDS['vthem']
-    if VERBOSE:
-        print('used vp=',vthep)
-        print('used vm=',vthem)
-    
-        print('L2_00', L2_00, 'a')
-        print('L2_pp', L2_pp, 'b')
-        print('L2_mm', L2_mm, 'c')
-        print('L2_0p', L2_0p, 'd')
-        print('L2_0m', L2_0m, 'e')
+
+    # prints information to get a good choice of vthep and vthem, depends of VERBOSE and SHOW_ABCDE
+    print_abcde(vthep, vthem, L2_00, L2_pp, L2_mm, L2_0p, L2_0m)
 
     C0 = L2_00 + L2_0p * vthep + L2_0m * vthem
     Cp = L2_pp + L2_0p / vthep
     Cm = L2_mm + L2_0m / vthem
 
     L_inv_save = BOUNDS['Lstab_inv']
-    L_inv_comp = (C0 + max(Cp, Cm))**ONE_DIV_2
-
-    if VERBOSE:
-        print('L_inv_stab=',L_inv_comp)
-        
+    L_inv_comp = (C0 + max(Cp, Cm))**half
     assert verify.o(L_inv_comp)
     add_check(L_inv_comp < L_inv_save, f"L_inv_stab norm not valid: {L_inv_comp} not less than {L_inv_save}") 
 
@@ -1746,25 +1688,26 @@ def substituting_estimates():
     resi_L2_sq  = BOUNDS['resi_stab_L2_sq']
     Dthe_op     = BOUNDS['Dthe_op']
 
-    rad_stab =  BOUNDS['rad_stab']
+    rad_stab = BOUNDS['rad_stab']
+    ell_stab = BOUNDS['lip_stab']
+    eige_lare = BOUNDS['lare']
+    
     laap = load_data.eigen_value_approx()
 
-    x_max = prod_Jfv_u1 / CJ0**ONE_DIV_2
-    if VERBOSE:
-        print('x_max=',x_max)
+    x_max = prod_Jfv_u1 / CJ0**half
     assert verify.o(x_max)
 
-    fvap_L2 = fvap_L2_sq**ONE_DIV_2
-    fvap_H1 = fvap_H1_sq**ONE_DIV_2
-    resi_L2 = resi_L2_sq**ONE_DIV_2
+    fvap_L2 = fvap_L2_sq**half
+    fvap_H1 = fvap_H1_sq**half
+    resi_L2 = resi_L2_sq**half
     
 
     aux_nume = Linv_bound * (x_max + fvap_L2)
-    aux_a = resi_L2 + Dthe_op*fvap_H1
+    aux_a = resi_L2 + Dthe_op * fvap_H1
     aux_b = Dthe_op
 
-    a = aux_a*aux_nume
-    b = aux_b*aux_nume
+    a = aux_a * aux_nume
+    b = aux_b * aux_nume
     c = x_max
 
     qq = ONE
@@ -1773,9 +1716,7 @@ def substituting_estimates():
     discriminant = ll**2 - 4*qq*aa
     
     
-    x_min = - (ll + discriminant**ONE_DIV_2) * ONE_DIV_2
-    if VERBOSE:
-        print('x_min=',x_min)
+    x_min = - (ll + discriminant**half) * half
     assert verify.o(x_min)
 
     xx = rad_stab
@@ -1787,24 +1728,19 @@ def substituting_estimates():
     eige_real = laap.real() - q_eta_x
 
     cont_exis = Tstab0 < xx
-    lips_cond = Tstab1 < 1
-    eige_cond = eige_real > 0
+    lips_cond = Tstab1 < ell_stab
+    eige_cond = eige_real > eige_lare
 
+    assert verify.o(Tstab0)
+    assert verify.o(Tstab1)
+    assert verify.o(q_eta_x)
+    
     add_check(discriminant > 0, f"Tstab discriminant not positive: {discriminant}")
     add_check(x_min < x_max, f"x_min: {x_min} is not less than x_max: {x_max}")
     add_check(cont_exis, f"Radius for Tstab not valid: {Tstab0} not less than {xx}") # Lemma 3.
     add_check(lips_cond, f"Tstab not Lipschitz: {Tstab1}") # Lemma 3.8
-    add_check(eige_cond, f"Eigen_real not positive: {eige_real}")
+    add_check(eige_cond, f"Eigen_real not positive: {eige_real} not greater than {eige_lare}")
     # TODO: Add the (at least) two remaining conditions
-    '''
-    print(a)
-    print(b)
-    print(c)
-
-    print(xx)
-    print(q_eta_x)
-    print(q_eta_x < xx)
-    '''
 
     #######################################
     # construct output

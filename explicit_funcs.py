@@ -6,11 +6,15 @@
 
 from sage.all import *
 from classes import FourierRealSeries, Functions_1D
-from parameters import RBF, CBF, ZERO, ONE, TWO, PI, TWOPI, ONE_DIV_2, VERBOSE, VERBOSE_COUNTER
+from parameters import (
+    RBF, CBF, 
+    ZERO, ONE, TWO, 
+    PI, TWOPI, ONE_DIV_2, 
+)
 from load_data import interval_from_J
 import auxiliar_funcs
 import verify
-from printing_macros import print_iter
+from printing_macros import print_iter_J
 
 from collections import deque
 
@@ -384,7 +388,7 @@ def compute_resis_exis(speed, coeffs, ode_values):
             kk = idx + 1
             residues[idx] += I_sols_resi_exis_from_precomp(func_values, kk, pre, nm1)
 
-        print_iter(counter, text=f"{J}")
+        print_iter_J(counter, text=f"{J}")
 
     residues += gk_exis_norm_sq(vs)
     return residues
@@ -413,7 +417,7 @@ def compute_resis_stab(lamb, the, speed, coeffs, ode_values):
             kk = idx + 1
             residues[idx] += I_sols_resi_stab_from_precomp(func_values, kk, pre, nm1)
 
-        print_iter(counter, text=f"{J}")
+        print_iter_J(counter, text=f"{J}")
     
     residues += gk_stab_norm_sq(vs, the)
     return residues
@@ -440,7 +444,7 @@ def compute_resis_Jfv(lamb, the, fv, speed, coeffs, ode_values):
         resi_p += I_sols_resi_Jfv_from_precomp(values[0], 0, pre, nm1)
         resi_m += I_sols_resi_Jfv_from_precomp(values[1], 1, pre, nm1)
         
-        print_iter(counter, text=f"{J}")
+        print_iter_J(counter, text=f"{J}")
 
     resi_p += auxiliar_funcs.norm_vector_sq(fvp) * TWOPI
     resi_m += auxiliar_funcs.norm_vector_sq(fvm) * TWOPI
@@ -1128,17 +1132,17 @@ def construct_exis_mat(ode_values):
     dividing by 2*pi, and subtracting 1 on the first subdiagonal.
     """
     n = len(ode_values[0][1]) # Maybe is a good idea construct this as a new class. n, poly_order would be attributes.
-    max_Nk = poly_ord(ode_values) + 1
+    poly_ord_p1 = poly_ord(ode_values) + 1
 
     exis_mat = matrix(CBF, n)   # (n x n) zero matrix
     for counter, (J, values) in enumerate(ode_values, start=1):
-        expo_vals = auxiliar_funcs.precompute_expo_vals(J, 0, n, max_Nk)
+        expo_vals = auxiliar_funcs.precompute_expo_vals(J, 0, n, poly_ord_p1)
     
         F = matrix(CBF, values).transpose() # rows = ll, cols = kk
         E = matrix(CBF, expo_vals)          # rows = jj, cols = ll
         exis_mat += E * F                   # rows = jj, cols = kk
         
-        print_iter(counter, text=f"{J}")
+        print_iter_J(counter, text=f"{J}")
 
     exis_mat /= TWOPI    
     for kk in range(n-1):
@@ -1160,11 +1164,11 @@ def construct_stab_mat(ode_values):
     nn = len(ode_values[0][1])
     N = (nn-2) // 4
     n = N + 1
-    max_Nk = poly_ord(ode_values) + 1
+    poly_ord_p1 = poly_ord(ode_values) + 1
 
     stab_mat = matrix(CBF, 2*n)   # 2n square matrix
     for counter, (J, values) in enumerate(ode_values, start=1):
-        expo_vals = auxiliar_funcs.precompute_expo_vals(J, -1, N, max_Nk)
+        expo_vals = auxiliar_funcs.precompute_expo_vals(J, -1, N, poly_ord_p1)
 
         F = matrix(CBF, values).transpose() # rows = ll, cols = kk
         E = matrix(CBF, expo_vals)          # rows = jj, cols = ll
@@ -1179,7 +1183,7 @@ def construct_stab_mat(ode_values):
         stab_mat[n:2*n, 0:2*N] += proj_mat[:, 2*N:4*N]    
         stab_mat[n:2*n, 2*N+1] += proj_mat[:, 4*N+1]   # mhom (Pi^-)
 
-        print_iter(counter, text=f"{J}")
+        print_iter_J(counter, text=f"{J}")
 
     stab_mat /= TWOPI
     for kk in range(N):
@@ -1192,13 +1196,13 @@ def construct_stab_mat(ode_values):
 # In[ ]:
 
 
-def bfv_constructor(Jfv_values, nm1, ord_mat):
-    max_Nk = poly_ord(Jfv_values) + 1
+def bfv_constructor(ode_values, nm1, ord_mat):
+    poly_ord_p1 = poly_ord(ode_values) + 1
     n = nm1 + 1
     
     bfv = vector(CBF, ord_mat)
-    for counter, (J, values) in enumerate(Jfv_values, start=1):
-        expo_vals = auxiliar_funcs.precompute_expo_vals(J, -1, nm1, max_Nk)
+    for counter, (J, values) in enumerate(ode_values, start=1):
+        expo_vals = auxiliar_funcs.precompute_expo_vals(J, -1, nm1, poly_ord_p1)
 
         F = matrix(CBF, values).transpose() # rows = ll, cols = 4
         E = matrix(CBF, expo_vals)          # rows = jj, cols = ll
@@ -1207,7 +1211,7 @@ def bfv_constructor(Jfv_values, nm1, ord_mat):
         bfv[:n] += proj_mat.column(0)
         bfv[n:] -= proj_mat.column(1) # <<<<-------- THE SIGN IS IMPORTANT
 
-        print_iter(counter, text=f"{J}")
+        print_iter_J(counter, text=f"{J}")
         
     return bfv / TWOPI
 
@@ -1284,14 +1288,14 @@ def compute_hk_norms_exis_ap(ode_values):
     """Computes the different quantities required in ... with the provided approximations""" 
     n = len(ode_values[0][1])
     N = n - 1
-    max_Nk = len(ode_values[0][1][0])
+    poly_ord_p1 =  poly_ord(ode_values) + 1
 
     hk_norm_ap_0 = vector(RBF, N)
     hk_norm_ap_1 = vector(RBF, N)
 
     for (J, values) in ode_values:
         _, _, _, rr = interval_from_J(J)
-        terms = _precomp_hk_norms_ap(rr, 2*max_Nk-1)
+        terms = _precomp_hk_norms_ap(rr, 2*poly_ord_p1-1)
 
         for ik, vk in enumerate(values[:-1]): # Pi already covered so we only return the hk, for k in [1,N]
             hk_norm_ap_0[ik] += _hk_norms_0(vk, terms)
@@ -1308,7 +1312,7 @@ def compute_hk_norms_stab_ap(ode_values):
     nn = len(ode_values[0][1])
     N = (nn-2) // 4
     n = N + 1
-    max_Nk = len(ode_values[0][1][0])
+    poly_ord_p1 =  poly_ord(ode_values) + 1
 
     hk_norm_ap_p0 = vector(RBF, 2*N+1)
     hk_norm_ap_m0 = vector(RBF, 2*N+1)
@@ -1317,7 +1321,7 @@ def compute_hk_norms_stab_ap(ode_values):
 
     for (J, values) in ode_values:
         _, _, _, rr = interval_from_J(J)
-        terms = _precomp_hk_norms_ap(rr, 2*max_Nk-1)
+        terms = _precomp_hk_norms_ap(rr, 2*poly_ord_p1-1)
 
         shift_pm = 2*N
         for ik in range(shift_pm):
@@ -1360,11 +1364,6 @@ def aux_sort_stab_mat(ode_bounds):
     nn = len(ode_bounds)
     nm1 = nn // 4
     ord_mat = 2*nm1 + 2
-    if VERBOSE:
-        print("sorting")
-        print('nn=',nn)
-        print('nm1=',nm1)
-        print('ordmat=',ord_mat)
 
     regular_resii = vector(RBF, ord_mat)
     for kk in range(nm1):
@@ -1379,10 +1378,7 @@ def aux_sort_stab_mat(ode_bounds):
 
 def poly_ord(values):
     """Helper function to access the order of the approximating polynomials"""
-    poly_order = len(values[0][1][0]) - 1
-    if VERBOSE:
-        print('poly_order=',poly_order)
-    return poly_order
+    return len(values[0][1][0]) - 1
 
 
 def _precomp_hk_norms_ap(rr, max_ord):

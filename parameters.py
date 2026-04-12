@@ -26,10 +26,12 @@ MAX_SUBINTERVALS = 2**15
 ############################
 ###### PRINTING INFOR ######
 ############################
-VERBOSE = 1      # Quantity of printed information, from 0 to 2. (o prints nothing while 2 the most).
-VERBOSE_COUNTER   = 40  # for treatment of J = (N,n) blocks 
-V3R8053_C0UN73R = 512 # for integrals and image computators
+VERBOSE = 0      # Quantity of printed information, from 0 to 1. (0 prints the essential, set to 1 to see progress and details).
+VERBOSE_COUNTER_J = 40  # for treatment of J = (N, n) blocks 
+VERBOSE_COUNTER_I = 512 # for integrals and image computators
+VERBOSE_COUNTER_N = 100 # for polynomial_roots and ...
 PRINT_DIGITS = 20
+SHOW_ABCDE = True
 
 
 ############################
