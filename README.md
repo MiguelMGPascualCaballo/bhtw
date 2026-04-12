@@ -103,7 +103,7 @@ Helper functions used to verify that everything works correctly and avoid silent
 
 Defines all global numerical parameters used in the computations.
 
-- VERBOSE controls the amount of printed information.
+- `VERBOSE` controls the amount of printed information.
 
 ### `printing_macros.py`
 
@@ -117,5 +117,5 @@ The routines in this file read the data from the `supplementary_data/`.
 
 Utility classes used to simplify parts of the code.
 
-- FourierRealSeries
-- Functions_1D
+- `FourierRealSeries`
+- `Functions_1D`
