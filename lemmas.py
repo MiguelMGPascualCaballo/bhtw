@@ -23,36 +23,35 @@ BOUNDS, BOUNDS_STR = load_data.load_bounds()
 # In[ ]:
 
 
-def norm_xi_twap_sq():
+def norm_xi_twap_sq(): # (Lemma 2.3)
     """
     Compute and validate an enclosure for the L2 norm of the residual xi
     associated with the approximate traveling wave.
 
     The residual is defined as
 
-        xi = c * v' + H(v) + v' * v,
+        xi = c * v' + Hv + v' * v,
 
     where c is the wave speed and v is the approximate traveling wave. The
     function evaluates xi symbolically, computes its norm in the Fourier-based
     convention used in the paper, and checks whether the resulting enclosure
     is below the bound prescribed in `BOUNDS['resi_exis_L2']`.
 
-    Notes:
-        The norm convention in the paper is expressed using only positive
-        Fourier modes for real odd functions. If
+    The norm convention in the paper is expressed using only positive
+    Fourier modes for real odd functions. If
 
-            xi(x) = sum_{k in Z} xi_k e^{ikx},
+        xi(x) = sum_{k in Z} xi_k e^{ikx},
 
-        then the norm used in the paper is
+    then the norm used in the paper is
 
-            (sum_{k >= 1} |xi_k|^2)^(1/2).
+        (sum_{k >= 1} |xi_k|^2)^(1/2).
 
-        Since `xi.norm_homogeneous()` returns
+    Since `xi.norm_homogeneous()` returns
 
-            (sum_{k in Z-{0}} |xi_k|^2)^(1/2),
+        (sum_{k in Z-{0}} |xi_k|^2)^(1/2),
 
-        and xi is assumed to be real and odd, we divide by `sqrt(2)` to
-        recover the norm used in the argument.
+    and xi is assumed to be real and odd, we divide by `sqrt(2)` to
+    recover the norm used in the argument.
     """
 
     #######################################
@@ -88,7 +87,7 @@ def norm_xi_twap_sq():
 # In[ ]:
 
 
-def norm_xi_fvap_sq():
+def norm_xi_fvap_sq(): # (Lemma 3.10)
     """
     Validate bounds associated with the approximate eigenfunction used in the
     stability argument.
@@ -100,24 +99,24 @@ def norm_xi_fvap_sq():
         2. A bound for the squared H1 norm of `fvap`.
         3. A bound for the squared L2 norm of the residual
 
-               xi_ap = L_{the,twap}(fvap) - laap * fvap.
+               xiap = L_{the,twap}(fvap) - laap * fvap.
 
-    The residual `xi_ap` measures how well `fvap` approximates an eigenvector
+    The residual `xiap` measures how well `fvap` approximates an eigenvector
     of the linearized operator.  Its L2 norm provides the defect of the
     approximation.
 
     The computed quantities are enclosed are compared
     against the validated bounds stored in `BOUNDS`:
 
-        ||fvap||_L2^2   < BOUNDS["fvap_stab_L2_sq"]
-        ||fvap||_H1^2   < BOUNDS["fvap_stab_H1_sq"]
-        ||xi_ap||_L2^2  < BOUNDS["resi_stab_L2_sq"]
+        ||fvap||_L2^2  < BOUNDS["fvap_stab_L2_sq"]
+        ||fvap||_H1^2  < BOUNDS["fvap_stab_H1_sq"]
+        ||xiap||_L2^2  < BOUNDS["resi_stab_L2_sq"]
 
     """
 
     #######################################
     # Output information
-    lemma_label = "Lemma 3.6"
+    lemma_label = "Lemma 3.10"
     bound_labels = ['fvap_stab_L2_sq', 'fvap_stab_H1_sq', 'resi_stab_L2_sq']
     bounds = [BOUNDS_STR[lab] for lab in bound_labels]
 
@@ -150,11 +149,11 @@ def norm_xi_fvap_sq():
     
     #######################################
     # resi_L2_sq
-    ## xi_ap = Lthelaap fvap - laap fvap,
+    ## xiap = Lthelaap fvap - laap fvap,
     ## where:
     ## Lthelaap f = (c + twap) (f' + ithe f) + Hf - i f0
     ##                          ‾‾‾‾‾‾‾‾‾‾‾|_ this is what we call `aux_term`
-    ##               ‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾|_ this is what we call `ft`, we split it into two different parts:
+    ##               ‾‾‾‾‾‾‾‾|_______________ this is what we call `ft`, we split it into two different parts:
     ##                                        the common indices with Hf and the rest 
     
     aux_term = fvap_der + I * theta * fvap
@@ -228,8 +227,11 @@ def norm_xi_fvap_sq():
 # In[ ]:
 
 
-def coeffs_are_not_zero():
-    """Checks that every cosine coefficient of the approximated traveling wave is never zero.""" 
+def coeffs_are_not_zero(): # (Lemma 4.3)
+    """
+    Checks that every cosine coefficient of the approximated traveling wave is never zero.
+    """ 
+    
     #######################################
     # Output information
     lemma_label = "Lemma 4.3"
@@ -248,7 +250,7 @@ def coeffs_are_not_zero():
 # In[ ]:
 
 
-def enclose_roots():
+def enclose_roots(): # (Lemma C.3)
     """
     Verify validated enclosures for the roots of the polynomial associated with
     the approximate traveling wave.
@@ -364,7 +366,7 @@ def enclose_roots():
 # In[ ]:
 
 
-def proots_exis():
+def proots_exis(): # (Lemma 4.12)
     """
     Verify a compatibility condition for the validated root enclosures of the
     polynomial associated with the approximate traveling wave.
@@ -440,7 +442,7 @@ def proots_exis():
 # In[ ]:
 
 
-def proots_stab():
+def proots_stab(): # (Lemma 5.25)
     """
     Verify a nondegeneracy condition for the validated root enclosures of the
     polynomial associated with the approximate traveling wave.
@@ -544,16 +546,13 @@ def proots_stab():
 # In[ ]:
 
 
-def beta_max():
+def beta_max(): # (Lemma 4.18)
     """
-    Verifies a supremum bound for
-        beta(x) := 1 / (c + v(x)),
-    where v is an approximation of the traveling wave with speed c.
-
-    The function checks whether
-        sup_{x in [0, pi]} |beta(x)| < bound_in,
-    using an adaptive 1D enclosure algorithm. To improve accuracy, the method
-    may use derivatives of beta up to the prescribed order.
+    Validate the uniform bound for
+    
+        beta(x) = 1 / (c + v(x))
+    
+    on [0,pi] and beta(x) > 0.
     """
     order = 2
 
@@ -595,7 +594,7 @@ def beta_max():
 # In[ ]:
 
 
-def kappa1():
+def kappa1(): # (Lemma 4.19)
     """
     Verifies an L1 bound for
         kappa1(x) := int_0^x beta(y)^2 dy,
@@ -647,20 +646,11 @@ def kappa1():
 # In[ ]:
 
 
-def betamod_L2sq():
+def betamod_L2sq(): # (Lemma 4.20)
     """
-    Verifies an L2-squared bound for the function
-        betamod(x) := beta'(x) + i * beta(x)^2,
-    where
-        beta(x) := 1 / (c + v(x)),
-    and v is an approximation of the traveling wave with speed c.
-
-    Since beta takes real values, we have
-        |betamod2(x)|^2 = |beta'(x) + i*beta(x)^2|^2 = beta'(x)^2 + beta(x)^4.
-
-    The function checks whether
-        ∫_{-pi}^{pi} ( beta'(x)^2 + beta(x)^4 ) dx <= bound_in,
-    using an adaptive 1D enclosure algorithm for the integral (Gauss–Legendre quadrature).
+    Validate the L^2 bound for
+    
+    beta'(x) + i beta(x)^2.
     """
     abs_tol = RBF('1e-2') 
     rel_tol = RBF('1e-4')
@@ -705,30 +695,12 @@ def betamod_L2sq():
 # In[ ]:
 
 
-def kappa2():
+def kappa2(): # (Lemma 4.21)
     """
-    Rigorously verifies an L¹([0, π]) bound for the function
-        kappa2(x) := ((beta'(x))² + beta(x)⁴)*kappa1.
-
-    We exchange the integration order and 
-    The function iota is defined as a primitive of
-        diota(x) := (beta'(x))² + beta(x)⁴ ≥ 0,
-    i.e.
-        iota(x) = ∫₀ˣ diota(y) dy.
-
-    The function beta is defined by
-        beta(x) := 1 / (c + v(x)),
-    where v is a traveling-wave approximation with wave speed c = `speed`,
-    represented via its cosine Fourier coefficients `coeffs`.
-
-    In the proof of the lemma, iota is chosen as an odd primitive (since diota
-    is even), which implies:
-      - iota is monotone increasing on [0, π],
-      - by symmetry,
-            || (iota(π) − iota(x)) · beta(x)² ||_{L¹([0, π])}
-          = || (iota(x) − iota(−π)) · beta(x)² ||_{L¹([−π, 0])}.
-
-            
+    Validate the L1 bound for kappa2.
+    
+    The quantity is computed through the triangular integral obtained after
+    exchanging the order of integration.
     """
     abs_tol = RBF("1e-1")
 
@@ -768,10 +740,11 @@ def kappa2():
 # In[ ]:
 
 
-def kappa3(): 
+def kappa3(): # (Lemma 5.27)
     """
-    Important to decide if being accurate or not
+    Validate the L1 bound for kappa3.
     """
+    
     abs_tol = RBF('1e-4') 
     rel_tol = RBF('1e-4')
 
@@ -821,10 +794,10 @@ def kappa3():
 # In[ ]:
 
 
-def kappa4():
-    '''
-    Important to decide if being accurate or not
-    '''
+def kappa4(): # (Lemma 5.28)
+    """
+    Validate the L1 bound for the kappa4 functions.
+    """
     abs_tol_1 = RBF('1e-4') 
     rel_tol_1 = RBF('1e-4')
     abs_tol_2 = RBF("1e-2")
@@ -891,8 +864,10 @@ def kappa4():
 # In[ ]:
 
 
-def hk_norm_exis_H2sq():
-
+def hk_norm_exis_H2sq(): # (Lemma 4.25)
+    """
+    Validate the bound for the summed L^2 second derivatives of the hk functions (4.44). 
+    """
     #######################################
     # Output information
     lemma_label = "Lemma 4.25"
@@ -970,8 +945,10 @@ def hk_norm_exis_H2sq():
 # In[11]:
 
 
-def hk_norm_stab_H1sq():
-
+def hk_norm_stab_H1sq(): # (Lemma 5.31)
+    """
+    Validate the L^2 and `H^1` bounds for the singular stability modes h_k^+ and h_k^- (5.28).
+    """
     #######################################
     # Output information
     lemma_label = "Lemma 5.31"
@@ -1049,8 +1026,10 @@ def hk_norm_stab_H1sq():
 # In[ ]:
 
 
-def svd_exis(): # checked, to recheck when resiis checked
-
+def svd_exis(): # (Lemma 4.16)
+    """
+    Validate the lower bound for the smallest singular value of M_exis^tor.
+    """
     #######################################
     # Output data
     lemma_label = "Lemma 4.16"
@@ -1110,8 +1089,10 @@ def svd_exis(): # checked, to recheck when resiis checked
 # In[ ]:
 
 
-def svd_regu(): # checked, to recheck when resiis checked
-
+def svd_regu(): # (Lemma 5.16)
+    """
+    Validate the positivity for the smallest singular value of M_stab^tor(1.035i).
+    """
     #######################################
     # Output data
     lemma_label = "Lemma 5.16"
@@ -1167,8 +1148,12 @@ def svd_regu(): # checked, to recheck when resiis checked
 # In[ ]:
 
 
-def svd_sing(): # checked, to recheck when resiis checked
-
+def svd_sing(): # (Lemma 5.22)
+    """
+    Let M = M_stab^tor(laap)
+    It proves an upper bound for the first (smallest) singular value of M and a lower bound for
+    the second one.
+    """
     #######################################
     # Output data
     lemma_label = "Lemma 5.22"
@@ -1227,7 +1212,10 @@ def svd_sing(): # checked, to recheck when resiis checked
 # In[ ]:
 
 
-def prod_fv_u1():
+def prod_fv_u1(): # (Lemma 5.23)
+    """
+    Verify a lower bound estimate for a dot product.
+    """
 
     #######################################
     # Output information
@@ -1314,10 +1302,9 @@ def prod_fv_u1():
 # In[ ]:
 
 
-def ode_resis_exis():
+def ode_resis_exis(): # (Lemma D.1)
     """
-    Verifies a strict L2 existence bound for the difference between our ODE approximations and 
-    true solutions.
+    Verifies an L2 bound for the difference between the hk functions (4.44) and our explicit approximations.
     """
 
     #######################################
@@ -1361,7 +1348,11 @@ def ode_resis_exis():
 # In[ ]:
 
 
-def ode_resis_regu(packed=None):
+def ode_resis_regu(packed=None): # (Lemma D.7)
+    """
+    Verifies an L2 bound for the difference between the hk functions (D.18) and our explicit approximations,
+    with lambda = 1.035i.
+    """
 
     #######################################
     # Output data
@@ -1411,7 +1402,11 @@ def ode_resis_regu(packed=None):
 # In[ ]:
 
 
-def ode_resis_sing():
+def ode_resis_sing(): # (Lemma D.8)
+    """
+    Verifies an L2 bound for the difference between the hk functions (D.18) and our explicit approximations,
+    with lambda = laap.
+    """
 
     lemma_label = "Lemma D.8"
     bound_labels = ['kappa3']
@@ -1430,7 +1425,10 @@ def ode_resis_sing():
 # In[ ]:
 
 
-def ode_resis_Jfv():
+def ode_resis_Jfv(): # (Lemma D.10)
+    """
+    See Section D.2.1.
+    """
 
     #######################################
     # Output data
@@ -1478,19 +1476,19 @@ def ode_resis_Jfv():
 # In[ ]:
 
 
-residual_norms = [ # OK
+residual_norms = [
     norm_xi_twap_sq, 
     norm_xi_fvap_sq,
 ]
 
-non_degen_coeffs = [ # OK
+non_degen_coeffs = [
     coeffs_are_not_zero, 
     enclose_roots, 
     proots_exis, 
     proots_stab,
 ]
 
-integral_bounds = [ # OK
+integral_bounds = [
     beta_max,     
     kappa1,       
     betamod_L2sq, 
@@ -1501,7 +1499,7 @@ integral_bounds = [ # OK
 
 hk_norms = [
     hk_norm_exis_H2sq, 
-    hk_norm_stab_H1sq, # OK
+    hk_norm_stab_H1sq,
 ]
 
 svd_results = [
@@ -1512,10 +1510,10 @@ svd_results = [
 ]
 
 ode_resis_results = [
-#    ode_resis_exis, 
-#    ode_resis_regu, 
+    ode_resis_exis, 
+    ode_resis_regu, 
     ode_resis_sing, 
-#    ode_resis_Jfv,
+    ode_resis_Jfv,
 ]
 
 
