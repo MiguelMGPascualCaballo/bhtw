@@ -1552,8 +1552,6 @@ def substituting_estimates():
     minimal_rad = (1 - discriminant**half) / (2*qq)
     maximal_rad = (1 + discriminant**half) / (2*qq)
 
-    verify.o(minimal_rad)
-
     xx = rad_exis
 
     cont_exis = aa + qq * xx**2
@@ -1571,7 +1569,7 @@ def substituting_estimates():
     add_check(lips_cond, f"Texis not Lipschitz: {lips_exis}")
 
     #######################################
-    # --- Corollary 3.5 ---
+    # --- Corollary 3.9 ---
     Dthe_save = BOUNDS['Dthe_op']
     
     coef = 2 * zet2**half * (1 + theta**2)**half
@@ -1581,7 +1579,7 @@ def substituting_estimates():
     add_check(Dthe_comp < Dthe_save, f"Dthe norm not valid: {Dthe_comp} not less than {Dthe_save}")    
 
     #######################################
-    # --- Corollary 4.23 ---
+    # --- Lemma 4.23 ---
     C1 = BOUNDS['beta_max']
     C2 = (BOUNDS['beta_mod'] * PI / RBF(12))**half
     C3 = BOUNDS['kappa2']**half
@@ -1609,10 +1607,10 @@ def substituting_estimates():
 
     # C3 := C1 / sqrt(2 pi) + C2
     aux_PI = (2 * PI)**half
-    L_inv_comp = C1 / aux_PI + C2
+    C3 = C1 / aux_PI + C2
 
-    assert verify.o(L_inv_comp)
-    add_check(L_inv_comp < L_inv_save, f"L_inv_exis norm not valid: {L_inv_comp} not less than {L_inv_save}")    
+    assert verify.o(C3)
+    add_check(C3 < L_inv_save, f"L_inv_exis norm not valid: {C3} not less than {L_inv_save}")    
 
     #######################################
     # --- Lemma 5.30 ---
@@ -1631,7 +1629,7 @@ def substituting_estimates():
     add_check(J1m_comp < J1m_save, f"Jm L2-H1 norm not valid: {J1m_comp} not less than {J1m_save}")  
     
     #######################################
-    # --- Lemma 5.32 ---
+    # --- Proposition 5.32 ---
     C0p = BOUNDS['hkL2p']
     C0m = BOUNDS['hkL2m']
     C1p = BOUNDS['hkH1p']
@@ -1643,7 +1641,7 @@ def substituting_estimates():
 
     sv2 = BOUNDS['svd_stab2']
 
-    aux_coef = (CJ0 / (sv2 * TWOPI) )**half
+    aux_coef = (CJ0 / (sv2 * TWOPI))**half
     ti_C0p_00 = aux_coef * C0p**half
     ti_C0m_00 = aux_coef * C0m**half
     ti_C1p_00 = aux_coef * C1p**half
@@ -1735,10 +1733,11 @@ def substituting_estimates():
     
     add_check(discriminant > 0, f"Tstab discriminant not positive: {discriminant}")
     add_check(x_min < x_max, f"x_min: {x_min} is not less than x_max: {x_max}")
-    add_check(cont_exis, f"Radius for Tstab not valid: {Tstab0} not less than {xx}") # Lemma 3.
-    add_check(lips_cond, f"Tstab not Lipschitz: {Tstab1}") # Lemma 3.8
-    add_check(eige_cond, f"Eigen_real not positive: {eige_real} not greater than {eige_lare}")
-    # TODO: Add the (at least) two remaining conditions
+    add_check(xx < x_max, f"xx: {xx} is not less than x_max: {x_max}")
+    
+    add_check(cont_exis, f"Radius for Tstab not valid: {Tstab0} not less than {xx}")           # Lemma 3.12
+    add_check(lips_cond, f"Tstab not Lipschitz: {Tstab1}")                                     # Lemma 3.13
+    add_check(eige_cond, f"Eigen_real not positive: {eige_real} not greater than {eige_lare}") # Lemma 3.14
 
     #######################################
     # construct output

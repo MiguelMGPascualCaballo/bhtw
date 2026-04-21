@@ -41,7 +41,7 @@ def print_lemma(verified, lemma_label, bounds, elapsed):
     status = "OK" if verified else "FAIL"
     print(f"{lemma_label}: {status}.")
     print(f"Execution time:{print_time(elapsed)}")
-    if bounds is not None:
+    if bounds is not None and VERBOSE:
         print("Used bounds were:")
         for (bound, label, side_txt) in bounds:
             if side_txt == 'apprx':
