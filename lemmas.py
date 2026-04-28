@@ -87,7 +87,7 @@ def norm_xi_twap_sq(): # (Lemma 2.3)
 # In[ ]:
 
 
-def norm_xi_fvap_sq(): # (Lemma 3.10)
+def norm_xi_fvap_sq(): # (Lemma 3.10 and 3.15)
     """
     Validate bounds associated with the approximate eigenfunction used in the
     stability argument.
@@ -96,7 +96,7 @@ def norm_xi_fvap_sq(): # (Lemma 3.10)
     eigenvector `fvap` and its associated approximate eigenvalue `laap`:
 
         1. A bound for the squared L2 norm of `fvap`.
-        2. A bound for the squared H1 norm of `fvap`.
+        2. Bounds for the squared H1 norm of `fvap`.
         3. A bound for the squared L2 norm of the residual
 
                xiap = L_{the,twap}(fvap) - laap * fvap.
@@ -110,13 +110,14 @@ def norm_xi_fvap_sq(): # (Lemma 3.10)
 
         ||fvap||_L2^2  < BOUNDS["fvap_stab_L2_sq"]
         ||fvap||_H1^2  < BOUNDS["fvap_stab_H1_sq"]
+        ||fvap||_H1^2  < BOUNDS["rad_stab"]
         ||xiap||_L2^2  < BOUNDS["resi_stab_L2_sq"]
 
     """
 
     #######################################
     # Output information
-    lemma_label = "Lemma 3.10"
+    lemma_label = "Lemma 3.10 and 3.15"
     bound_labels = ['fvap_stab_L2_sq', 'fvap_stab_H1_sq', 'resi_stab_L2_sq']
     bounds = [BOUNDS_STR[lab] for lab in bound_labels]
 
@@ -133,6 +134,7 @@ def norm_xi_fvap_sq(): # (Lemma 3.10)
     fvap_L2sq_save = BOUNDS['fvap_stab_L2_sq']
     fvap_H1sq_save = BOUNDS['fvap_stab_H1_sq']
     resi_L2sq_save = BOUNDS['resi_stab_L2_sq']
+    rad_stab = BOUNDS["rad_stab"]
     
     #######################################
     # fvap_L2_sq
@@ -214,7 +216,8 @@ def norm_xi_fvap_sq(): # (Lemma 3.10)
     cond_fvap_L2_sq = fvap_L2sq_comp < fvap_L2sq_save
     cond_fvap_H1_sq = fvap_H1sq_comp < fvap_H1sq_save
     cond_resi_L2_sq = norm_xisq_comp < resi_L2sq_save
-    verified = cond_fvap_L2_sq and cond_fvap_H1_sq and cond_resi_L2_sq
+    cond_lemma_3_15 = fvap_H1sq_comp > rad_stab**2
+    verified = cond_fvap_L2_sq and cond_fvap_H1_sq and cond_resi_L2_sq and cond_lemma_3_15
     return verified, lemma_label, bounds
 
 
