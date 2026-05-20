@@ -110,7 +110,7 @@ def norm_xi_fvap_sq(): # (Lemma 3.10 and 3.15)
 
         ||fvap||_L2^2  < BOUNDS["fvap_stab_L2_sq"]
         ||fvap||_H1^2  < BOUNDS["fvap_stab_H1_sq"]
-        ||fvap||_H1^2  < BOUNDS["rad_stab"]
+        ||fvap||_H1    > BOUNDS["rad_stab"]
         ||xiap||_L2^2  < BOUNDS["resi_stab_L2_sq"]
 
     """
@@ -118,7 +118,7 @@ def norm_xi_fvap_sq(): # (Lemma 3.10 and 3.15)
     #######################################
     # Output information
     lemma_label = "Lemma 3.10 and 3.15"
-    bound_labels = ['fvap_stab_L2_sq', 'fvap_stab_H1_sq', 'resi_stab_L2_sq']
+    bound_labels = ['fvap_stab_L2_sq', 'fvap_stab_H1_sq', 'resi_stab_L2_sq', 'rad_stab']
     bounds = [BOUNDS_STR[lab] for lab in bound_labels]
 
     #######################################
@@ -128,13 +128,13 @@ def norm_xi_fvap_sq(): # (Lemma 3.10 and 3.15)
     speed  = load_data.speed()
     coeffs = load_data.coeffs()
     laap   = load_data.eigen_value_approx()
-    theta    = load_data.theta()
+    theta  = load_data.theta()
     fvap   = load_data.eigen_fv()
     
     fvap_L2sq_save = BOUNDS['fvap_stab_L2_sq']
     fvap_H1sq_save = BOUNDS['fvap_stab_H1_sq']
     resi_L2sq_save = BOUNDS['resi_stab_L2_sq']
-    rad_stab = BOUNDS["rad_stab"]
+    rad_stab       = BOUNDS["rad_stab"]
     
     #######################################
     # fvap_L2_sq

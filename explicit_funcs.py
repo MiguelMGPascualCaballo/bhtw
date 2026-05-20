@@ -264,7 +264,7 @@ def big_bounds_compute_fast(polynom):
     
     However, this implementation is faster.
     """
-    rk = len(polynom) - 1
+    rk = len(polynom)
     
     abs_coeffs = [coef.abs() for coef in polynom]
     
@@ -332,8 +332,8 @@ def root_polynomial_is_enclosed(root, polynom, rad, big_bounds):
     bound1 = ZERO
     bound2 = ZERO
 
-    for kk, val in enumerate(big_bounds,start=1):
-        if kk >= 3:
+    for kk, val in enumerate(big_bounds):
+        if kk >= 2:
             bound1 += rad**kk / RBF(factorial(kk)) * val.above_abs()
             bound2 += rad**(kk-1) / RBF(factorial(kk-1)) * val.above_abs()
 
