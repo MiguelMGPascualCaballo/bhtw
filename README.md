@@ -1,11 +1,78 @@
+# Computer-assisted verification for *Linear instability of a Burgers--Hilbert traveling wave*
+
+This repository contains the code and supplementary data used to reproduce the computer-assisted parts of the proof.
+
+## Requirements
+
+The code must be run in a SageMath-enabled Python environment. In particular, the following import must work:
+
+```python
+from sage.all import *
+```
+
 ## Note
 
-Some large data files listed below are not included in the repository and are available on Zenodo: https://doi.org/10.5281/zenodo.19250315.
-They must be placed in `supplementary_data/`.
+Some large data files listed below are not included in the repository and must be downloaded from Zenodo:
+
+<https://doi.org/10.5281/zenodo.19250315>
+
+These data files must be placed in `supplementary_data/`.
+
+## Python source files
+
+### `script.py`
+
+Main script reproducing all computer-assisted results.
+
+- Calls the verification routines defined in `lemmas.py`.
+- Outputs timing information and verification status for each lemma and the final routine.
+
+Running this script reproduces all computer-assisted checks reported in the paper.
+
+### `lemmas.py`
+
+Each function in this file corresponds to a specific lemma, except for the final routine, which verifies that all substitutions made in the paper are correct.
+
+### `auxiliar_funcs.py`
+
+Generic and reusable adaptive verification algorithms.
+
+### `methods.py`
+
+Reusable numerical methods independent of any specific lemma.
+
+### `explicit_funcs.py`
+
+Functions and routines specific to the problem studied in the paper.
+
+### `verify.py`
+
+Helper functions used to verify that everything works correctly and avoid silent bugs.
+
+### `parameters.py`
+
+Defines all global numerical parameters used in the computations.
+
+- `VERBOSE` controls the amount of printed information.
+
+### `printing_macros.py`
+
+Helper functions to print progress and status of the proof.
+
+### `load_data.py`
+
+Routines for reading the data files in `supplementary_data/`.
+
+### `classes.py`
+
+Utility classes used to simplify parts of the code.
+
+- `FourierRealSeries`
+- `Functions_1D`
 
 ## Data files
 
-All data files are located in the `supplementary_data/` directory and are provided as plain text files and read by the routines in `load_data.py`.
+All data files are located in the `supplementary_data/` directory. They are plain text files read by the routines in `load_data.py`.
 
 ### `tw_data.txt`
 
@@ -65,57 +132,5 @@ All data files are located in the `supplementary_data/` directory and are provid
 ### `bounds.txt`
 
 - Read with `load_bounds()`.
-- Every remaining bound used in the paper.
+- Contains all remaining bounds used in the paper.
 
-## Python source files
-
-### `script.py`
-
-Main execution script reproducing all computer-assisted results.
-
-- Calls the verification routines defined in `lemmas.py`.
-- Outputs timing information and verification status for each lemma and the last routine, which verifies that every substitution along the paper is correct.
-
-Running this script reproduces all computer-assisted checks reported in the paper.
-**Important:** this script must be run in a **SageMath-enabled Python environment**. In particular, `from sage.all import *` must work.
-
-### `lemmas.py`
-
-Each function in this file corresponds to a specific lemma in the Appendix, except for the last one, which checks that all substitutions in the paper are correct.
-
-### `auxiliar_funcs.py`
-
-Generic and reusable adaptive verification algorithms.
-
-### `methods.py`
-
-Reusable numerical methods independent of any specific lemma.
-
-### `explicit_funcs.py`
-
-Functions and routines relative to our problem. 
-
-### `verify.py`
-
-Helper functions used to verify that everything works correctly and avoid silent bugs.
-
-### `parameters.py`
-
-Defines all global numerical parameters used in the computations.
-
-- `VERBOSE` controls the amount of printed information.
-
-### `printing_macros.py`
-
-Helper functions to print progress and status of the proof.
-
-### `load_data.py`
-
-The routines in this file read the data from the `supplementary_data/`.
-
-### `classes.py`
-
-Utility classes used to simplify parts of the code.
-
-- `FourierRealSeries`
-- `Functions_1D`
