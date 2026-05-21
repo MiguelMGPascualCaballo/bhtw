@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 # coding: utf-8
 
-# In[ ]:
+# In[4]:
 
 
 from sage.all import *
@@ -19,7 +19,7 @@ from printing_macros import print_iter_J
 from collections import deque
 
 
-# In[ ]:
+# In[5]:
 
 
 def equ_tw_eval_symbolic(speed, coeffs):
@@ -46,7 +46,7 @@ def equ_tw_eval_symbolic(speed, coeffs):
     return xi 
 
 
-# In[ ]:
+# In[6]:
 
 
 def fvap_der_and_Hil(fvap, N):
@@ -84,7 +84,7 @@ def fvap_der_and_Hil(fvap, N):
     return fvap_der, fvap_Hil
 
 
-# In[ ]:
+# In[7]:
 
 
 def beta_func_constructor(speed, coeffs, order=4):
@@ -95,7 +95,7 @@ def beta_func_constructor(speed, coeffs, order=4):
     
 
 
-# In[ ]:
+# In[8]:
 
 
 def aux_kappa1_func_constructor(speed, coeffs, order=4):
@@ -115,7 +115,7 @@ def aux_kappa1_func_constructor(speed, coeffs, order=4):
     return result
 
 
-# In[ ]:
+# In[9]:
 
 
 def betamod_func_sq_constructor(speed, coeffs, order):
@@ -143,7 +143,7 @@ def betamod_func_sq_constructor(speed, coeffs, order):
     return nume * deno.inverse()
 
 
-# In[ ]:
+# In[10]:
 
 
 def beta_dx_func_sq_constructor(speed, coeffs, order):
@@ -167,14 +167,14 @@ def beta_dx_func_sq_constructor(speed, coeffs, order):
     return nume * deno.inverse()
 
 
-# In[ ]:
+# In[18]:
 
 
 def real_gk_funcs_constructor(coeffs, order):
     N = len(coeffs)
     
     func_list = []
-    for kk in range(N):
+    for kk in range(1,N+1):
         sine_coeffs = [vkm for vkm in coeffs[kk:]]
         sine_series = FourierRealSeries.sine(sine_coeffs) * RBF(kk)
         func = Functions_1D.from_FourierRealSeries(sine_series, order)
