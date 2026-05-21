@@ -1,6 +1,6 @@
 # Computer-assisted verification for *Linear instability of a Burgers--Hilbert traveling wave*
 
-This repository contains the code and supplementary data used to reproduce the computer-assisted parts of the proof.
+This repository accompanies the paper [*Linear instability of a Burgers--Hilbert traveling wave*](https://arxiv.org/abs/2605.03920) and contains the code and supplementary data used to reproduce the computer-assisted parts of the proof.
 
 ## Requirements
 
