@@ -1679,7 +1679,7 @@ def substituting_estimates():
     add_check(L_inv_comp < L_inv_save, f"L_inv_stab norm not valid: {L_inv_comp} not less than {L_inv_save}") 
 
     #######################################
-    # --- HARD LEMMAS ---
+    # --- Lemmas 3.12-3.14 ---
     Linv_bound  = BOUNDS['Lstab_inv']
     prod_Jfv_u1 = BOUNDS['Jfvu1']
     fvap_L2_sq  = BOUNDS['fvap_stab_L2_sq']
